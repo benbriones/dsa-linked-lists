@@ -72,29 +72,26 @@ class LLStr {
    *
    * Throws IndexError on empty list.
    **/
-  //TODO: refactor?
   pop(): string {
 
     if (this.length === 0) {
       throw new IndexError("empty list");
     }
 
+    let foundNodeVal = this.tail!.val;
+
     if (this.length === 1) {
-      const foundNode = this.head!;
       this.head = null;
       this.tail = null;
-      this.length--;
-      return foundNode.val;
+    } else {
+      let current = this.head!;
+      while (current.next !== this.tail) {
+        current = current.next!;
+      }
+      this.tail = current;
+      current.next = null;
     }
 
-    let current = this.head!;
-    while (current.next !== this.tail) {
-      current = current.next!;
-    }
-
-    const foundNodeVal = this.tail!.val;
-    this.tail = current;
-    current.next = null;
     this.length--;
     return foundNodeVal;
   }
@@ -105,7 +102,23 @@ class LLStr {
    **/
 
   shift(): string {
-    return "x";
+
+    if (this.length === 0) {
+      throw new IndexError("empty list");
+    }
+
+    const currHeadVal = this.head!.val;
+
+    if (this.length === 1) {
+      this.head = null;
+      this.tail = null;
+    } else {
+      const newHead = this.head!.next!;
+      this.head = newHead;
+    }
+
+    this.length--;
+    return currHeadVal;
   }
 
   /** getAt(idx): get val at idx.
@@ -114,7 +127,17 @@ class LLStr {
    **/
 
   getAt(idx: number): string {
-    return "x";
+
+    if (idx >= this.length || idx < 0) {
+      throw new IndexError("index out of bounds");
+    }
+
+    let current = this.head;
+    for (let i = 0; i < idx; i++) {
+      current = current!.next;
+    }
+
+    return current!.val;
   }
 
   /** setAt(idx, val): set val at idx to val.
@@ -123,6 +146,16 @@ class LLStr {
    **/
 
   setAt(idx: number, val: string): void {
+    if (idx >= this.length || idx < 0) {
+      throw new IndexError("index out of bounds");
+    }
+
+    let current = this.head;
+    for (let i = 0; i < idx; i++) {
+      current = current!.next;
+    }
+
+    current!.val = val;
   }
 
   /** insertAt(idx, val): add node w/val before idx.
@@ -131,6 +164,30 @@ class LLStr {
    **/
 
   insertAt(idx: number, val: string): void {
+    if ((idx > this.length) || idx < 0) {
+      throw new IndexError("index out of bounds");
+    }
+
+    if (idx === 0) {
+      this.unshift(val);
+      return;
+    }
+
+    if (idx === this.length) {
+      this.push(val);
+      return;
+    }
+
+    const newNode = new NodeStr(val);
+
+    let current = this.head;
+    for (let i = 0; i < idx - 1; i++) {
+      current = current!.next;
+    }
+
+    newNode.next = current!.next;
+    current!.next = newNode;
+    this.length++;
   }
 
   /** removeAt(idx): return & remove item at idx,
@@ -139,7 +196,28 @@ class LLStr {
    **/
 
   removeAt(idx: number): string {
-    return "x";
+    if (idx >= this.length || idx < 0) {
+      throw new IndexError("index out of bounds");
+    }
+
+    if (idx === 0) {
+      return this.shift();
+    }
+
+    if (idx === this.length - 1) {
+      return this.pop();
+    }
+
+    let current = this.head;
+    for (let i = 0; i < idx - 1; i++) {
+      current = current!.next;
+    }
+
+    const foundVal = current!.next!.val;
+    current!.next = current!.next!.next;
+    this.length--;
+
+    return foundVal;
   }
 
   /** toArray (useful for tests!) */
